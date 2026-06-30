@@ -33,8 +33,12 @@ the acting identity is the logged-in user.
 
 Split the user request into one or more **intents**. Map keywords/scenarios:
 
-- **Email** (→ local-email): 邮件, 收件箱, 未读, Apple Mail, 发邮件, 回复, 收到的…, an
-  `@`-address recipient, "send/reply/forward", checking what someone emailed.
+- **Email** (→ local-email, **always**): 邮件, 收件箱, 未读, Apple Mail, 发邮件, 回复,
+  收到的…, an `@`-address recipient, "send/reply/forward", checking what someone emailed.
+  **All email/mail intents go to local Apple Mail — including 飞书邮箱 / Feishu Mail.**
+  Feishu Mail (`lark-mail`) is **disabled** in this plugin; never route any mail
+  request to `lark-cli mail` / `lark-mail`, even if the user says 飞书邮箱. The only
+  Feishu surface that is *not* a mail intent is IM/群聊 (→ lark-im).
 - **Feishu docs** (→ lark-doc / lark-wiki): 飞书文档/云文档/docx, wiki/知识库, a
   `feishu.cn/.../docx/…` or `/wiki/…` link, "读文档/总结文档".
 - **Feishu calendar** (→ lark-calendar): 日历, 日程, 会议, 约时间, freebusy, "安排/创建会议".
@@ -47,9 +51,10 @@ Split the user request into one or more **intents**. Map keywords/scenarios:
 - **Drive / 云盘** (→ lark-drive): 云盘, 文件夹, 上传/下载/移动文件, 文件导入.
 
 Other Feishu surfaces have their own skills too (lark-approval, lark-okr,
-lark-slides, lark-markdown, lark-whiteboard, lark-mail, lark-attendance,
+lark-slides, lark-markdown, lark-whiteboard, lark-attendance,
 lark-contact …). Route to whichever matches; fall back to the relevant skill's
-`lark-cli <domain> --help` if unsure.
+`lark-cli <domain> --help` if unsure. (`lark-mail` is intentionally excluded —
+mail always goes to local Apple Mail, see the Email intent above.)
 
 Default folder for Feishu docs when the user gives no link (project convention):
 `https://icanplatform.feishu.cn/drive/folder/RtWofl1yalrpKYd9tS1c8STnnqd`.
