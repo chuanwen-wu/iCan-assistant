@@ -2,7 +2,7 @@
 
 English | [简体中文](./README_zh.md)
 
-## What it is
+## Overview
 
 A single, copyable Claude Code plugin that turns Claude into an **office copilot** on
 macOS. It bundles two backends and a router/orchestrator that picks the right one:
