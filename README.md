@@ -98,16 +98,17 @@ Three things the plugin can't bundle for you:
 
 ## Feishu bot setup (open platform)
 
-The `lark` MCP talks to Feishu as a **custom app (bot) you own**. Do this once on the
-[Feishu Open Platform](https://open.feishu.cn/) (Lark international:
-<https://open.larksuite.com/>). Exact menu labels vary by client version and between
-Feishu (CN) and Lark (intl), but the flow is the same.
+The `lark` MCP talks to Feishu as a **custom app (bot) you own**. Do this once in the
+developer console — Feishu CN: <https://open.feishu.cn/app> (Lark international:
+<https://open.larksuite.com/>). Labels below are the Feishu CN ones; the flow is the
+same on Lark.
 
 ### 1. Create the app & get credentials
 
-Developer console → **Create custom app** (创建企业自建应用). Open **Credentials &
-Basic Info** (凭证与基础信息) to copy the **App ID** (`cli_…`) and **App Secret** —
-these are your `FEISHU_APP_ID` / `FEISHU_APP_SECRET`.
+Developer console (<https://open.feishu.cn/app>) → **Create custom app**
+(创建企业自建应用). Open **Credentials & Basic Info** (凭证与基础信息) to copy the
+**App ID** (`cli_…`) and **App Secret** — these are your `FEISHU_APP_ID` /
+`FEISHU_APP_SECRET`.
 
 ### 2. Enable the bot capability
 

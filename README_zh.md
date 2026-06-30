@@ -85,14 +85,14 @@ iCan-assistant/
 
 ## 飞书 Bot 配置（开放平台）
 
-`lark` MCP 是以**你自己的飞书自建应用（机器人）** 身份访问飞书的。在
-[飞书开放平台](https://open.feishu.cn/)（国际版 Lark：<https://open.larksuite.com/>）做一次性配置。
-不同客户端版本、以及飞书（国内）与 Lark（国际）的菜单名略有差异，但流程一致。
+`lark` MCP 是以**你自己的飞书自建应用（机器人）** 身份访问飞书的。在开发者后台做一次性配置——
+国内版飞书：<https://open.feishu.cn/app>（国际版 Lark：<https://open.larksuite.com/>）。下面的菜单名
+按国内版飞书来写；Lark 上流程一致。
 
 ### 1. 创建应用，拿到凭据
 
-开发者后台 → **创建企业自建应用**。进入**凭证与基础信息**，复制 **App ID**（`cli_…`）和
-**App Secret** —— 它们就是 `FEISHU_APP_ID` / `FEISHU_APP_SECRET`。
+开发者后台（<https://open.feishu.cn/app>）→ **创建企业自建应用**。进入**凭证与基础信息**，
+复制 **App ID**（`cli_…`）和 **App Secret** —— 它们就是 `FEISHU_APP_ID` / `FEISHU_APP_SECRET`。
 
 ### 2. 开启机器人能力
 
