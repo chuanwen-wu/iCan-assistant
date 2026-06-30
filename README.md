@@ -1,5 +1,7 @@
 # iCan-assistant
 
+English | [简体中文](./README_zh.md)
+
 A single, copyable Claude Code plugin that turns Claude into an **office copilot** on
 macOS. It bundles two backends and a router/orchestrator that decides which to use:
 
@@ -51,16 +53,16 @@ iCan-assistant/
 
 This repo is itself a Claude Code plugin **marketplace** (manifest at
 `.claude-plugin/marketplace.json`, marketplace name `ican`; the plugin lives at the
-repo root). To install:
+repo root). The repo is **public** — no GitHub login or SSH key needed. To install:
 
 ```
 # 1. Add the marketplace
-/plugin marketplace add git@github.com:chuanwen-wu/iCan-assistant.git
+/plugin marketplace add https://github.com/chuanwen-wu/iCan-assistant.git
 #   or, from a local clone:
 /plugin marketplace add /path/to/iCan-assistant
 
 # 2. Install the plugin
-/plugin install iCan-assistant@ican
+/plugin install ican-assistant@ican
 
 # 3. (interactive browser, optional)
 /plugin

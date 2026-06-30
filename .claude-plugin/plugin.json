@@ -1,5 +1,5 @@
 {
-  "name": "iCan-assistant",
+  "name": "ican-assistant",
   "version": "0.1.0",
   "description": "Unified macOS office copilot: routes requests to local Apple Mail (via AppleScript) or Feishu/Lark (via the lark MCP — IM, calendar, docs, tasks), and orchestrates multi-step workflows like read docs -> summarize -> send email / create calendar event / create tasks.",
   "author": {

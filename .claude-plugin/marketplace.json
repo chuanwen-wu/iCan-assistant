@@ -8,8 +8,8 @@
   },
   "plugins": [
     {
-      "name": "iCan-assistant",
-      "source": ".",
+      "name": "ican-assistant",
+      "source": "./",
       "description": "Unified macOS office copilot: local Apple Mail (AppleScript) + Feishu/Lark (lark MCP — IM, calendar, docs, tasks), with multi-step workflow orchestration (read docs -> summarize -> email / calendar / tasks)."
     }
   ]
