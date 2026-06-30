@@ -42,12 +42,6 @@ iCan-assistant/
 - Python 3 (for `mail.py`).
 - A Feishu/Lark app's credentials (for the lark MCP).
 
-## Setup (one-time)
-
-- `cp .env.example .env` in this folder and fill in `FEISHU_APP_ID` /
-   `FEISHU_APP_SECRET`. (`.env` is gitignored; the launcher auto-discovers it from
-   `$CLAUDE_PLUGIN_ROOT/.env`, the plugin folder, or the host project's `.env`.)
-
 ## Install (recommended: via the marketplace)
 
 This repo is itself a Claude Code plugin **marketplace** (manifest at

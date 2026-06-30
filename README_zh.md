@@ -37,12 +37,6 @@ iCan-assistant/
 - Python 3（用于 `mail.py`）。
 - 一个飞书/Lark 应用的凭据（用于 lark MCP）。
 
-## 初始化设置（一次性）
-
-- 在本目录执行 `cp .env.example .env`，填入 `FEISHU_APP_ID` / `FEISHU_APP_SECRET`。
-   （`.env` 已被 gitignore；启动器会自动从 `$CLAUDE_PLUGIN_ROOT/.env`、插件目录或宿主项目的
-   `.env` 中发现它。）
-
 ## 安装（推荐：通过插件市场）
 
 本仓库自身就是一个 Claude Code 插件**市场**（清单位于
