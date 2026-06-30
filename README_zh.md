@@ -39,10 +39,9 @@ iCan-assistant/
 
 ## 初始化设置（一次性）
 
-1. 在本目录执行 `cp .env.example .env`，填入 `FEISHU_APP_ID` / `FEISHU_APP_SECRET`。
+- 在本目录执行 `cp .env.example .env`，填入 `FEISHU_APP_ID` / `FEISHU_APP_SECRET`。
    （`.env` 已被 gitignore；启动器会自动从 `$CLAUDE_PLUGIN_ROOT/.env`、插件目录或宿主项目的
    `.env` 中发现它。）
-2. 确保 `scripts/*.sh` / `scripts/*.py` 有可执行权限（`chmod +x`）。
 
 ## 安装（推荐：通过插件市场）
 

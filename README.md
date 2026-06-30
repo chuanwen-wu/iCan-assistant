@@ -44,10 +44,9 @@ iCan-assistant/
 
 ## Setup (one-time)
 
-1. `cp .env.example .env` in this folder and fill in `FEISHU_APP_ID` /
+- `cp .env.example .env` in this folder and fill in `FEISHU_APP_ID` /
    `FEISHU_APP_SECRET`. (`.env` is gitignored; the launcher auto-discovers it from
    `$CLAUDE_PLUGIN_ROOT/.env`, the plugin folder, or the host project's `.env`.)
-2. Make sure `scripts/*.sh` / `scripts/*.py` are executable (`chmod +x`).
 
 ## Install (recommended: via the marketplace)
 
