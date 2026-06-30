@@ -1,0 +1,16 @@
+{
+  "name": "ican",
+  "owner": {
+    "name": "chuanwen-wu"
+  },
+  "metadata": {
+    "description": "iCan plugin marketplace"
+  },
+  "plugins": [
+    {
+      "name": "iCan-assistant",
+      "source": ".",
+      "description": "Unified macOS office copilot: local Apple Mail (AppleScript) + Feishu/Lark (lark MCP — IM, calendar, docs, tasks), with multi-step workflow orchestration (read docs -> summarize -> email / calendar / tasks)."
+    }
+  ]
+}
