@@ -74,9 +74,14 @@ commands, and the `lark` MCP server load automatically. `${CLAUDE_PLUGIN_ROOT}` 
 
 **Each user still does two things the plugin can't bundle:**
 
-1. **Feishu credentials** — `cp .env.example .env` in the installed plugin folder and
-   fill in `FEISHU_APP_ID` / `FEISHU_APP_SECRET` (or export them, or set
-   `FEISHU_ENV_FILE=/abs/path/.env`). `.env` is gitignored — never commit real keys.
+1. **Feishu credentials** — give the `lark` MCP server `FEISHU_APP_ID` /
+   `FEISHU_APP_SECRET`. Don't put a `.env` inside the installed plugin folder: it
+   lives under a versioned cache path and is wiped on upgrade. Use one of:
+   - **Recommended** — keep a `.env` at a stable location and point the launcher at
+     it: `export FEISHU_ENV_FILE=/abs/path/.env` (e.g. in your shell profile). `.env`
+     is gitignored — never commit real keys.
+   - **Or** export the variables directly:
+     `export FEISHU_APP_ID=… FEISHU_APP_SECRET=…`.
 2. **macOS Automation permission** — approve the prompt to let your terminal control
    "Mail" the first time email is used (System Settings → Privacy & Security →
    Automation). Email is macOS-only; Feishu features are cross-platform.

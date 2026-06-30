@@ -68,9 +68,13 @@ iCan-assistant/
 
 **每位用户仍需自行完成两件插件无法捆绑的事：**
 
-1. **飞书凭据** —— 在已安装的插件目录执行 `cp .env.example .env` 并填入
-   `FEISHU_APP_ID` / `FEISHU_APP_SECRET`（或导出为环境变量，或设置
-   `FEISHU_ENV_FILE=/abs/path/.env`）。`.env` 已被 gitignore —— 切勿提交真实密钥。
+1. **飞书凭据** —— 给 `lark` MCP server 提供 `FEISHU_APP_ID` / `FEISHU_APP_SECRET`。
+   不要把 `.env` 放进已安装的插件目录：它位于带版本号的 cache 路径下，插件升级后会丢失。
+   二选一：
+   - **推荐** —— 把 `.env` 放在固定位置，用 `FEISHU_ENV_FILE` 指过去：
+     `export FEISHU_ENV_FILE=/abs/path/.env`（写进 shell profile）。`.env` 已被
+     gitignore —— 切勿提交真实密钥。
+   - **或** 直接导出环境变量：`export FEISHU_APP_ID=… FEISHU_APP_SECRET=…`。
 2. **macOS 自动化权限** —— 首次使用邮件时，批准让终端控制 “Mail” 的弹窗
    （系统设置 → 隐私与安全性 → 自动化）。邮件功能仅限 macOS；飞书功能跨平台可用。
 
