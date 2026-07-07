@@ -60,6 +60,19 @@ def run_osascript(script: str, args=None):
                 "\nHint: grant this terminal Automation access to 'Mail' in "
                 "System Settings -> Privacy & Security -> Automation.\n"
             )
+        elif "-2741" in err or "-600" in err or "connection invalid" in err.lower():
+            # The bundled scripts are known-good. Both signatures mean a sandbox
+            # blocked Apple Events/XPC to Mail: -2741 is a bogus "syntax error"
+            # (Mail's scripting terms couldn't load at compile time); -600
+            # "Application isn't running" appears even while Mail is running.
+            sys.stderr.write(
+                "\nHint: this is NOT a script bug — the process appears to be "
+                "sandboxed and blocked from talking to Mail (Apple Events/XPC). "
+                "Re-run this command outside the sandbox: in agents that sandbox "
+                "shell commands (e.g. Codex), request approval to run with "
+                "escalated permissions. (If Mail.app is genuinely not running in "
+                "a GUI session, open it first.)\n"
+            )
         sys.exit(2)
     return proc.stdout
 

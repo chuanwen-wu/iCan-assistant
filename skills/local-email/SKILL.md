@@ -16,6 +16,10 @@ only; Mail.app must exist and the terminal must have Automation access to "Mail"
 
 1. Don't read `~/Library/Mail` directly — macOS blocks it (Operation not
    permitted). Always go through `mail.py`, which uses Apple Events.
+   **Run it unsandboxed**: command sandboxes (e.g. Codex seatbelt) block Apple
+   Events/XPC, which surfaces as a misleading osascript "syntax error" (-2741)
+   plus "Connection invalid" XPC noise. If you see that, the script is fine —
+   re-run with escalated permissions / outside the sandbox.
 2. Messages are addressed by their **message id** (the RFC `Message-ID`), shown in
    `list`/`search` output. Pass it as the first positional arg to
    `read`/`reply`/`mark`/`move`/`delete`.
