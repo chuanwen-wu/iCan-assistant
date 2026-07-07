@@ -1,6 +1,6 @@
 ---
 name: local-email
-description: Read and control the user's local macOS Apple Mail (Mail.app) — list accounts and mailboxes, list/search/read messages, count unread, send, reply, mark read/unread, move, and delete. Use whenever the user asks about "my email", "my inbox", "本地邮件", "Apple Mail", reading/searching/sending mail on this Mac, or replying to a message. macOS only.
+description: Read and control the user's local macOS Apple Mail (Mail.app) — list accounts and mailboxes, list/search/read messages, count unread, send, reply, mark read/unread, move, and delete. This is the ONLY mail backend on this Mac — every email intent routes here, including 飞书邮箱 / Feishu Mail (lark-mail is disabled) and the send-email step of any multi-step workflow (e.g. 整理会议纪要后发邮件给参会人). Use whenever the user asks about "my email", "my inbox", "本地邮件", "Apple Mail", 发邮件/发送邮件/写邮件/回复邮件/转发邮件, reading/searching/sending mail on this Mac, or replying to a message. macOS only.
 ---
 
 # Local Email (Apple Mail control)
