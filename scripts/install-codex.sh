@@ -1,15 +1,22 @@
 #!/usr/bin/env bash
-# Install (or uninstall) the ican-assistant Codex adapter (issue #10):
-#   1. skills/{office-router,local-email}  -> ~/.agents/skills/    (symlink; --copy to copy)
-#   2. adapters/codex/prompts/*.md         -> ~/.codex/prompts/    (/office, /email)
-#   3. adapters/codex/AGENTS.md            -> managed block inside ~/.codex/AGENTS.md
+# Install (or uninstall) the ican-assistant Codex adapter (issues #10, #25):
+#   1. skills/{office-router,local-email}  -> ~/.agents/skills/   (symlink; --copy to copy)
+#      ($HOME-based Agent Skills standard dir — deliberately NOT under CODEX_HOME;
+#       both the Codex CLI and the desktop app discover skills there)
+#   2. adapters/codex/prompts/*.md         -> <codex home>/prompts/   (/office, /email)
+#   3. adapters/codex/AGENTS.md            -> managed block inside <codex home>/AGENTS.md
+#
+# Codex home detection (#25): the CLI reads $CODEX_HOME from the environment, but the
+# desktop app is a GUI process that never sources shell profiles and always uses
+# ~/.codex — so prompts/AGENTS.md are installed into EVERY detected home:
+#   $CODEX_HOME (env) + CODEX_HOME= found in shell profiles + a live-looking ~/.codex.
 #
 # Usage:
 #   scripts/install-codex.sh [--copy] [--uninstall]
 #
 # Env overrides (mainly for tests):
-#   ICAN_AGENTS_SKILLS_DIR  skills destination  (default: $HOME/.agents/skills)
-#   CODEX_HOME              codex config home   (default: $HOME/.codex)
+#   ICAN_AGENTS_SKILLS_DIR  skills destination (default: $HOME/.agents/skills)
+#   ICAN_CODEX_HOMES        colon-separated codex homes; skips detection entirely
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -19,9 +26,6 @@ SKILLS=(office-router local-email)
 PROMPTS=(office.md email.md)
 
 SKILLS_DEST="${ICAN_AGENTS_SKILLS_DIR:-$HOME/.agents/skills}"
-CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
-PROMPTS_DEST="$CODEX_HOME/prompts"
-AGENTS_FILE="$CODEX_HOME/AGENTS.md"
 
 BEGIN_MARK='<!-- BEGIN ican-assistant'
 END_MARK='<!-- END ican-assistant -->'
@@ -32,10 +36,59 @@ for arg in "$@"; do
   case "$arg" in
     --uninstall) MODE=uninstall ;;
     --copy) COPY=1 ;;
-    -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
     *) echo "unknown option: $arg (see --help)" >&2; exit 2 ;;
   esac
 done
+
+# ---- codex home detection (#25) --------------------------------------------
+
+# Last CODEX_HOME= assignment found in the usual shell profiles, with quotes
+# stripped and ~ / $HOME expanded. Empty output when none is found.
+profile_codex_home() {
+  local f line val
+  for f in "$HOME/.zshenv" "$HOME/.zprofile" "$HOME/.zshrc" \
+           "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"; do
+    [ -f "$f" ] || continue
+    line=$(grep -E '^[[:space:]]*(export[[:space:]]+)?CODEX_HOME=' "$f" | tail -1) || true
+    [ -n "$line" ] || continue
+    val=${line#*CODEX_HOME=}
+    val=${val%%#*}
+    val=$(printf '%s' "$val" | sed -e "s/^[[:space:]]*//" -e "s/[[:space:]]*\$//" \
+                                   -e "s/^[\"']//" -e "s/[\"']\$//")
+    val=${val/#\~/$HOME}
+    val=${val//\$\{HOME\}/$HOME}
+    val=${val//\$HOME/$HOME}
+    if [ -n "$val" ]; then printf '%s\n' "$val"; return 0; fi
+  done
+  return 0
+}
+
+CODEX_HOMES=()
+add_codex_home() {
+  local h
+  [ -n "$1" ] || return 0
+  for h in ${CODEX_HOMES[@]+"${CODEX_HOMES[@]}"}; do
+    [ "$h" = "$1" ] && return 0
+  done
+  CODEX_HOMES+=("$1")
+}
+
+if [ -n "${ICAN_CODEX_HOMES:-}" ]; then
+  IFS=':' read -r -a _homes <<< "$ICAN_CODEX_HOMES"
+  for h in "${_homes[@]}"; do add_codex_home "$h"; done
+else
+  add_codex_home "${CODEX_HOME:-}"
+  add_codex_home "$(profile_codex_home)"
+  # The GUI desktop app always uses ~/.codex; include it when it looks live.
+  if [ -e "$HOME/.codex/config.toml" ] || [ -e "$HOME/.codex/auth.json" ] \
+     || [ -e "$HOME/.codex/version.json" ]; then
+    add_codex_home "$HOME/.codex"
+  fi
+  [ "${#CODEX_HOMES[@]}" -gt 0 ] || add_codex_home "$HOME/.codex"
+fi
+
+# ---- helpers ----------------------------------------------------------------
 
 # Confirm the source really is an ican-assistant skill before rm -rf'ing anything.
 is_our_skill_dir() { # $1 = dir, $2 = expected skill name
@@ -49,6 +102,8 @@ strip_managed_block() { # $1 = file; prints content without the managed block
     skip && index($0, e) == 1 { skip = 0 }
   ' "$1"
 }
+
+# ---- install / uninstall ----------------------------------------------------
 
 install_skills() {
   mkdir -p "$SKILLS_DEST"
@@ -74,10 +129,10 @@ install_skills() {
   done
 }
 
-install_prompts() {
-  mkdir -p "$PROMPTS_DEST"
+install_prompts() { # $1 = codex home
+  mkdir -p "$1/prompts"
   for p in "${PROMPTS[@]}"; do
-    src="$ADAPTER_DIR/prompts/$p" dest="$PROMPTS_DEST/$p"
+    src="$ADAPTER_DIR/prompts/$p" dest="$1/prompts/$p"
     if [ -f "$dest" ] && ! cmp -s "$src" "$dest"; then
       cp "$dest" "$dest.bak"
       echo "backup   $dest -> $dest.bak"
@@ -87,12 +142,13 @@ install_prompts() {
   done
 }
 
-install_agents_md() {
-  mkdir -p "$CODEX_HOME"
-  touch "$AGENTS_FILE"
-  { strip_managed_block "$AGENTS_FILE"; cat "$ADAPTER_DIR/AGENTS.md"; } > "$AGENTS_FILE.tmp"
-  mv "$AGENTS_FILE.tmp" "$AGENTS_FILE"
-  echo "agents   managed block updated in $AGENTS_FILE"
+install_agents_md() { # $1 = codex home
+  local agents_file="$1/AGENTS.md"
+  mkdir -p "$1"
+  touch "$agents_file"
+  { strip_managed_block "$agents_file"; cat "$ADAPTER_DIR/AGENTS.md"; } > "$agents_file.tmp"
+  mv "$agents_file.tmp" "$agents_file"
+  echo "agents   managed block updated in $agents_file"
 }
 
 uninstall() {
@@ -104,19 +160,21 @@ uninstall() {
       rm -rf "$dest" && echo "removed  $dest (copy)"
     fi
   done
-  for p in "${PROMPTS[@]}"; do
-    dest="$PROMPTS_DEST/$p"
-    if [ -f "$dest" ] && cmp -s "$ADAPTER_DIR/prompts/$p" "$dest"; then
-      rm "$dest" && echo "removed  $dest"
-    elif [ -f "$dest" ]; then
-      echo "SKIP $dest: modified locally — remove it manually" >&2
+  for home in "${CODEX_HOMES[@]}"; do
+    for p in "${PROMPTS[@]}"; do
+      dest="$home/prompts/$p"
+      if [ -f "$dest" ] && cmp -s "$ADAPTER_DIR/prompts/$p" "$dest"; then
+        rm "$dest" && echo "removed  $dest"
+      elif [ -f "$dest" ]; then
+        echo "SKIP $dest: modified locally — remove it manually" >&2
+      fi
+    done
+    if [ -f "$home/AGENTS.md" ]; then
+      strip_managed_block "$home/AGENTS.md" > "$home/AGENTS.md.tmp"
+      mv "$home/AGENTS.md.tmp" "$home/AGENTS.md"
+      echo "removed  managed block from $home/AGENTS.md"
     fi
   done
-  if [ -f "$AGENTS_FILE" ]; then
-    strip_managed_block "$AGENTS_FILE" > "$AGENTS_FILE.tmp"
-    mv "$AGENTS_FILE.tmp" "$AGENTS_FILE"
-    echo "removed  managed block from $AGENTS_FILE"
-  fi
 }
 
 if [ "$MODE" = uninstall ]; then
@@ -125,8 +183,11 @@ if [ "$MODE" = uninstall ]; then
 fi
 
 install_skills
-install_prompts
-install_agents_md
+echo "codex homes: ${CODEX_HOMES[*]}"
+for home in "${CODEX_HOMES[@]}"; do
+  install_prompts "$home"
+  install_agents_md "$home"
+done
 
 cat <<EOF
 
