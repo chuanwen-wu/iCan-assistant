@@ -9,7 +9,7 @@ You coordinate two backends to get office work done on this Mac:
 
 | Backend | How to call it | Use for |
 |---|---|---|
-| **Local Apple Mail** | `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mail.py …` (see the `local-email` skill) | reading/searching/sending/replying email, inbox triage |
+| **Local Apple Mail** | the `local-email` skill — its bundled engine `scripts/mail.py` (inside that skill's directory), run with `python3` | reading/searching/sending/replying email, inbox triage |
 | **Feishu / Lark** | **`lark-cli`** + the `lark-*` skills (see the skill map below) | docs/wiki, calendar, tasks, IM/chat, 多维表格, 电子表格, 妙记, VC, 审批, OKR, drive… |
 
 This router is a **dispatcher**: it classifies the request and hands each Feishu

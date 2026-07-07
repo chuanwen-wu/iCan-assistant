@@ -7,7 +7,7 @@ closes #
 ## 测试（对应 CLAUDE.md 测试要求）
 - [ ] CI 通过（manifest 校验 / 脚本语法 / frontmatter 检查）
 - [ ] 本地市场安装或 `/plugin update` 后重启会话，模拟用户主流程验证
-- [ ] 涉及 `scripts/mail.py` 的变更已在真机 Apple Mail 上手动验证
+- [ ] 涉及 `skills/local-email/scripts/mail.py` 的变更已在真机 Apple Mail 上手动验证
 - [ ] 涉及飞书的变更已用本人身份（`lark-cli` user）验证
 
 ## 检查项

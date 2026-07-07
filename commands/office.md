@@ -3,8 +3,8 @@ description: Office copilot — route email/Feishu requests and orchestrate mult
 ---
 
 Use the `office-router` skill to handle this request. It coordinates local Apple
-Mail (`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mail.py`, in-repo:
-`plugins/iCan-assistant/scripts/mail.py`) and Feishu/Lark (`lark-cli` + the `lark-*`
+Mail (`python3 ${CLAUDE_PLUGIN_ROOT}/skills/local-email/scripts/mail.py`, in-repo:
+`skills/local-email/scripts/mail.py`) and Feishu/Lark (`lark-cli` + the `lark-*`
 skills). Feishu actions run as the user's own identity (`lark-cli config default-as
 user`; one-time `lark-cli auth login` required).
 

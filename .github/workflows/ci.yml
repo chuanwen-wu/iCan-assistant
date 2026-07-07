@@ -27,25 +27,50 @@ jobs:
           jq -e '.version | test("^[0-9]+\\.[0-9]+\\.[0-9]+$")' .claude-plugin/plugin.json >/dev/null \
             || { echo "plugin.json version is not semver"; exit 1; }
 
-      - name: Python syntax check (scripts/)
+      - name: Python syntax check
         run: |
-          for f in scripts/*.py; do
+          for f in scripts/*.py skills/*/scripts/*.py; do
+            [ -e "$f" ] || continue
             python3 -m py_compile "$f"
           done
 
-      - name: Check SKILL.md frontmatter
+      - name: Check SKILL.md against the Agent Skills standard
         run: |
           for f in skills/*/SKILL.md; do
             head -1 "$f" | grep -q '^---$' || { echo "$f: missing frontmatter"; exit 1; }
-            grep -q '^name:' "$f" || { echo "$f: frontmatter missing name"; exit 1; }
-            grep -q '^description:' "$f" || { echo "$f: frontmatter missing description"; exit 1; }
+            fm=$(awk 'NR==1{next} /^---$/{exit} {print}' "$f")
+            [ -n "$fm" ] || { echo "$f: frontmatter not closed with ---"; exit 1; }
+            name=$(printf '%s\n' "$fm" | sed -n 's/^name:[[:space:]]*//p' | head -1)
+            desc=$(printf '%s\n' "$fm" | sed -n 's/^description:[[:space:]]*//p' | head -1)
+            [ -n "$name" ] || { echo "$f: frontmatter missing name"; exit 1; }
+            [ -n "$desc" ] || { echo "$f: frontmatter missing description"; exit 1; }
+            printf '%s' "$name" | grep -Eq '^[a-z0-9]+(-[a-z0-9]+)*$' \
+              || { echo "$f: name ($name) must be lowercase letters/digits/hyphens"; exit 1; }
+            [ "${#name}" -le 64 ] || { echo "$f: name exceeds 64 chars"; exit 1; }
+            [ "${#desc}" -le 1024 ] || { echo "$f: description exceeds 1024 chars"; exit 1; }
             dir=$(basename "$(dirname "$f")")
-            skill=$(sed -n 's/^name:[[:space:]]*//p' "$f" | head -1)
-            if [ "$dir" != "$skill" ]; then
-              echo "$f: frontmatter name ($skill) != directory name ($dir)"
+            if [ "$dir" != "$name" ]; then
+              echo "$f: frontmatter name ($name) != directory name ($dir)"
               exit 1
             fi
           done
+
+      - name: Check skills are self-contained (Agent Skills standard)
+        run: |
+          # No Claude-only variables inside skills — other agents don't inject them.
+          if grep -rn 'CLAUDE_PLUGIN_ROOT' skills/; then
+            echo "skills/ must not reference CLAUDE_PLUGIN_ROOT; use paths relative to the skill dir (issue #9)"
+            exit 1
+          fi
+          # Executable resources bundled with a skill belong in its scripts/ subdir.
+          bad=$(find skills -mindepth 2 \( -name '*.py' -o -name '*.sh' \) ! -path 'skills/*/scripts/*' || true)
+          if [ -n "$bad" ]; then
+            echo "scripts must live in skills/<skill>/scripts/:"; echo "$bad"
+            exit 1
+          fi
+          # The mail engine must ship inside the local-email skill.
+          test -f skills/local-email/scripts/mail.py \
+            || { echo "missing skills/local-email/scripts/mail.py"; exit 1; }
 
       - name: Check command frontmatter
         run: |

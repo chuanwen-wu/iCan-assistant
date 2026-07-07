@@ -8,9 +8,9 @@ description: Read and control the user's local macOS Apple Mail (Mail.app) — l
 Drive the user's Apple Mail through a single CLI wrapper around AppleScript. macOS
 only; Mail.app must exist and the terminal must have Automation access to "Mail".
 
-**Engine:** `${CLAUDE_PLUGIN_ROOT}/scripts/mail.py` (run with `python3`).
-When this plugin is used in-repo rather than installed, the path is
-`plugins/iCan-assistant/scripts/mail.py`.
+**Engine:** `scripts/mail.py`, bundled inside this skill directory (run with
+`python3`). Resolve it relative to this SKILL.md — i.e.
+`<this-skill-dir>/scripts/mail.py` — wherever the skill is installed.
 
 ## How to work
 

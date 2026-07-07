@@ -4,8 +4,8 @@ description: Read or control local Apple Mail (list/search/read/send/reply/mark/
 
 Use the `local-email` skill to act on the user's local Apple Mail.
 
-Engine: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mail.py` (in-repo:
-`python3 plugins/iCan-assistant/scripts/mail.py`).
+Engine: `python3 ${CLAUDE_PLUGIN_ROOT}/skills/local-email/scripts/mail.py`
+(in-repo: `python3 skills/local-email/scripts/mail.py`).
 
 User request: $ARGUMENTS
 
