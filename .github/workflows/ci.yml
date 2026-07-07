@@ -74,9 +74,27 @@ jobs:
 
       - name: Check command frontmatter
         run: |
-          for f in commands/*.md; do
+          for f in commands/*.md adapters/codex/prompts/*.md; do
             head -1 "$f" | grep -q '^---$' || { echo "$f: missing frontmatter"; exit 1; }
             grep -q '^description:' "$f" || { echo "$f: frontmatter missing description"; exit 1; }
+          done
+
+      - name: Check Codex adapter (issue #10)
+        run: |
+          bash -n scripts/install-codex.sh
+          test -x scripts/install-codex.sh || { echo "install-codex.sh must be executable"; exit 1; }
+          test -f adapters/codex/AGENTS.md
+          grep -q '^<!-- BEGIN ican-assistant' adapters/codex/AGENTS.md \
+            && grep -q '^<!-- END ican-assistant -->' adapters/codex/AGENTS.md \
+            || { echo "adapters/codex/AGENTS.md must be wrapped in BEGIN/END markers"; exit 1; }
+          # Adapters must stay agent-portable like skills — no Claude-only variables.
+          if grep -rn 'CLAUDE_PLUGIN_ROOT' adapters/; then
+            echo "adapters/ must not reference CLAUDE_PLUGIN_ROOT"; exit 1
+          fi
+          # Repo-level Codex discovery: .agents/skills symlinks must resolve.
+          for s in office-router local-email; do
+            test -f ".agents/skills/$s/SKILL.md" \
+              || { echo ".agents/skills/$s must symlink to skills/$s"; exit 1; }
           done
 
       - name: Guard — no lark MCP resurrection
@@ -85,7 +103,7 @@ jobs:
             echo "lark MCP files must not come back (see CLAUDE.md)"
             exit 1
           fi
-          if grep -rn 'mcp__lark__' skills/ commands/ scripts/ 2>/dev/null; then
+          if grep -rn 'mcp__lark__' skills/ commands/ scripts/ adapters/ 2>/dev/null; then
             echo "references to mcp__lark__* must not come back (see CLAUDE.md)"
             exit 1
           fi

@@ -34,8 +34,15 @@ iCan-assistant/
 ├── scripts/
 │   └── mail.py                    # 兼容转发（已迁入 local-email 技能，勿新增依赖）
 ├── commands/
-│   ├── office.md                  # /office —— 完整路由 + 编排
-│   └── email.md                   # /email —— 仅邮件
+│   ├── office.md                  # /office —— 完整路由 + 编排（Claude Code）
+│   └── email.md                   # /email —— 仅邮件（Claude Code）
+├── .agents/skills/                # 仓库级 Codex 技能发现（symlink → skills/）
+├── adapters/
+│   └── codex/                     # Codex 适配层（见「安装到 Codex」）
+│       ├── AGENTS.md              # 注入 ~/.codex/AGENTS.md 的托管规则块
+│       └── prompts/               # /office、/email 的 Codex 自定义 prompt
+├── scripts/
+│   └── install-codex.sh           # Codex 一键安装 / 卸载
 ├── .gitignore
 └── README.md
 ```
@@ -69,6 +76,36 @@ iCan-assistant/
 安装后，`office-router` / `local-email` 技能与 `/office`、`/email` 命令会自动加载。剩下的
 一次性配置只有两件：批准 macOS 自动化权限弹窗（见 [环境要求](#环境要求)），以及配置
 `lark-cli`（见下一节）。
+
+## 安装到 Codex（CLI / IDE / 桌面版）
+
+Codex 原生支持同一套 [Agent Skills 开放标准](https://agentskills.io)，克隆本仓库后一条命令装好：
+
+```bash
+git clone https://github.com/chuanwen-wu/iCan-assistant.git && cd iCan-assistant
+scripts/install-codex.sh          # 默认 symlink 技能（仓库更新即生效）；--copy 则复制一份
+```
+
+脚本做三件事（幂等，可重复执行；`--uninstall` 全部撤销）：
+
+1. `skills/{office-router,local-email}` → `~/.agents/skills/`——Codex 的用户级技能目录，
+   `/skills` 可见、`$office-router` 可显式提及、按 description 隐式触发；
+2. `adapters/codex/prompts/{office,email}.md` → `~/.codex/prompts/`——提供与 Claude Code
+   等价的 `/office`、`/email` 命令；
+3. 把 `adapters/codex/AGENTS.md` 作为托管块注入 `~/.codex/AGENTS.md`（带 BEGIN/END 标记，
+   不动你自己的内容）——固化路由红线（邮件只走 Apple Mail）、lark-cli 本人身份要求和对外
+   动作确认门槛。
+
+一次性配置与 Claude Code 相同：macOS 自动化权限 + `lark-cli` 登录（见下节）。飞书侧的
+`lark-*` 技能由 lark-cli 提供，同样安装进 `~/.agents/skills` 即可被 Codex 使用。
+
+不装也行：仓库自带 `.agents/skills/` 符号链接，直接在本仓库目录里打开 Codex 就能发现这
+两个技能（仓库级发现，只在本仓库内生效）。若你设置了 `CODEX_HOME`，脚本会跟随它安装
+prompts 与 AGENTS.md。
+
+> 未提供 `agents/openai.yaml`：其 `interface`/`policy` 默认值（frontmatter 取名、允许隐式
+> 触发）已满足需要，`dependencies` 只支持声明 MCP server，而本插件依赖的是 CLI
+> （python3 / lark-cli），无从声明，故省略。
 
 ## 飞书配置（lark-cli）
 
@@ -145,9 +182,10 @@ lark-cli whoami                   # 确认："identity": "user"，"tokenStatus":
   python3 skills/local-email/scripts/mail.py list --limit 10 --json  # 机器可读的 JSON 输出
   ```
 
-- **其他 Agent（Codex / Gemini CLI 等）：** `skills/` 下每个技能都是符合
+- **其他 Agent（Gemini CLI 等）：** `skills/` 下每个技能都是符合
   [Agent Skills 开放标准](https://agentskills.io) 的自包含目录（资源以技能目录相对路径引用），
   把整个技能目录复制进对应 agent 的技能目录（如 `.agents/skills/`）即可被识别使用。
+  Codex 用户不必手动复制，直接用 [安装到 Codex](#安装到-codexcli--ide--桌面版)。
 
 - **飞书：** 确保已安装并登录 `lark-cli`（见上面步骤），用 `lark-cli <domain> …` 驱动
   （例如 `lark-cli calendar +agenda`）。
@@ -158,9 +196,11 @@ lark-cli whoami                   # 确认："identity": "user"，"tokenStatus":
 
 - `/office <请求>` —— 跨邮件 + 飞书的路由 + 多步编排。
 - `/email <请求>` —— 仅邮件。
-- 若与其他插件的同名命令冲突，用完整写法：`/ican-assistant:office`、`/ican-assistant:email`。
+- 若与其他插件的同名命令冲突，用完整写法：Claude Code 下 `/ican-assistant:office`、
+  `/ican-assistant:email`；Codex 下 `/prompts:office`、`/prompts:email`。
 - 或直接自然语言提问（“看下我未读邮件”、“总结这几个飞书文档并发给老板”）——
-  `office-router` 技能会在邮件/飞书/办公工作流类请求上自动触发。
+  `office-router` 技能会在邮件/飞书/办公工作流类请求上自动触发（Codex 中也可用
+  `$office-router` 显式提及）。
 
 ## 安全
 
