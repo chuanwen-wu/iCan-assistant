@@ -25,7 +25,7 @@ labels: bug, needs-review
 
 ## 涉及模块
 - [ ] office-router（意图分类/路由/编排）
-- [ ] local-email / `scripts/mail.py`（Apple Mail）
+- [ ] local-email / `skills/local-email/scripts/mail.py`（Apple Mail）
 - [ ] 飞书后端（lark-cli / lark-* skill）
 - [ ] 插件安装 / 更新 / marketplace
 - [ ] 文档（README / SKILL.md）

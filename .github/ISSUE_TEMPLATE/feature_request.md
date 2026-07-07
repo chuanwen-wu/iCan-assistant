@@ -23,7 +23,7 @@ labels: feature, needs-review
 
 ## 涉及模块
 - [ ] office-router（新意图/新路由规则/新编排流程）
-- [ ] local-email / `scripts/mail.py`（Apple Mail 新能力）
+- [ ] local-email / `skills/local-email/scripts/mail.py`（Apple Mail 新能力）
 - [ ] 飞书后端（依赖哪些 lark-* skill / lark-cli 命令：___）
 - [ ] 新 skill / 新 command
 - [ ] 文档
