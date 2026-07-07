@@ -1,6 +1,6 @@
 {
   "name": "ican-assistant",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Unified macOS office copilot: routes requests to local Apple Mail (via AppleScript) or Feishu/Lark (via lark-cli + the lark-* skills — IM, calendar, docs, tasks, bitable, sheets, minutes & more, acting as the user), and orchestrates multi-step workflows like read docs -> summarize -> send email / create calendar event / create tasks.",
   "author": {
     "name": "ican_bot"
