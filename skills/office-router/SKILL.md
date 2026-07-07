@@ -39,6 +39,10 @@ Split the user request into one or more **intents**. Map keywords/scenarios:
   Feishu Mail (`lark-mail`) is **disabled** in this plugin; never route any mail
   request to `lark-cli mail` / `lark-mail`, even if the user says 飞书邮箱. The only
   Feishu surface that is *not* a mail intent is IM/群聊 (→ lark-im).
+  **This rule holds at every step of a multi-step workflow**: even when all earlier
+  steps ran in Feishu (妙记, docs, calendar, VC), the 发邮件/send-email step still
+  goes to `local-email`. Do not pick a `lark-mail` skill for it even if the host has
+  one installed whose description matches 发送邮件/写邮件/回复邮件.
 - **Feishu docs** (→ lark-doc / lark-wiki): 飞书文档/云文档/docx, wiki/知识库, a
   `feishu.cn/.../docx/…` or `/wiki/…` link, "读文档/总结文档".
 - **Feishu calendar** (→ lark-calendar): 日历, 日程, 会议, 约时间, freebusy, "安排/创建会议".
@@ -97,9 +101,15 @@ see Safety); `high-risk-write` additionally needs `--yes`, only after the user O
 When a request has multiple stages (the typical pattern is **gather → process →
 act**), do this:
 
-1. **Plan.** State a short numbered plan back to the user before executing
-   (e.g. "1) read docs A,B,C  2) summarize  3) draft email to X + create a Feishu
-   task"). For non-trivial plans, get a quick OK.
+1. **Plan.** State a short numbered plan back to the user before executing, and
+   **tag every step with its backend/skill** — e.g. "1) read docs A,B,C → lark-doc
+   2) summarize  3) draft email to X → local-email (`mail.py send --draft`) +
+   create a Feishu task → lark-task". Backends are decided **here**, once, using the
+   Step 1 classification — never re-picked when a step is executed. In particular,
+   an email step is **always → local-email**, even if every step before it ran in
+   Feishu: being deep in lark-* context does not turn 发邮件 into a `lark-mail`
+   intent (`lark-mail` is disabled — see Step 1). For non-trivial plans, get a
+   quick OK.
 2. **Gather.** Read every needed input first (doc reads via `lark-doc`,
    `mail.py read`, etc.). Run independent reads in parallel. Collect results before
    moving on.
@@ -112,9 +122,15 @@ act**), do this:
    email/draft, event id, task link, chat message id).
 
 **Example.** "把这三个飞书文档总结一下，发邮件给老板，并在飞书建个跟进任务":
-gather = read 3 docs via `lark-doc`; process = write summary; act =
-`mail.py send --to <boss> --subject … --body <summary> --draft` (local-email)
-**and** a follow-up task via `lark-task`; report both handles.
+gather = read 3 docs → `lark-doc`; process = write summary; act =
+`mail.py send --to <boss> --subject … --body <summary> --draft` → `local-email`
+**and** a follow-up task → `lark-task`; report both handles.
+
+**Example.** "这个妙记链接做下会议纪要，发邮件给参会人": gather = transcript/summary
+via `lark-minutes` + attendee names/emails via `lark-minutes`/`lark-vc`/
+`lark-contact`; process = write the minutes; act = `mail.py send --to <attendees>
+--subject … --body … --draft` → **`local-email`** — *not* `lark-mail`, even though
+every gather step ran in Feishu; report the draft/message id.
 
 ## Safety rules (apply across both backends)
 

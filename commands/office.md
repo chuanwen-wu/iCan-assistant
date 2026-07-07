@@ -14,8 +14,10 @@ Steps:
 1. Classify the request into email and/or Feishu intents (docs, calendar, tasks, IM,
    多维表格, 电子表格, 妙记, …).
 2. If it's a multi-step workflow, state a short numbered plan first (gather →
-   process → act), then execute.
-3. Route each intent to the right backend per the office-router skill.
+   process → act) **with each step tagged with its backend/skill**, then execute.
+3. Route each intent to the right backend per the office-router skill. Email steps
+   always go to `local-email` (`mail.py`) — never `lark-mail` / `lark-cli mail` —
+   even when every other step of the workflow runs in Feishu (妙记/文档/日历).
 4. Confirm before any outward/destructive action (send/reply email, post IM, create
    or patch calendar events/tasks, delete/move mail, share doc). Prefer `--draft`
    for email when send intent is unclear.
