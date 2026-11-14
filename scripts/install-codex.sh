@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Install (or uninstall) the ican-assistant Codex adapter (issues #10, #25):
-#   1. skills/{office-router,local-email}  -> ~/.agents/skills/   (symlink; --copy to copy)
+#   1. skills/{office-router,ican-web,local-email} -> ~/.agents/skills/ (symlink; --copy)
 #      ($HOME-based Agent Skills standard dir — deliberately NOT under CODEX_HOME;
 #       both the Codex CLI and the desktop app discover skills there)
-#   2. adapters/codex/prompts/*.md         -> <codex home>/prompts/   (/office, /email)
+#   2. adapters/codex/prompts/*.md         -> <codex home>/prompts/ (/office, /email, /chat)
 #   3. adapters/codex/AGENTS.md            -> managed block inside <codex home>/AGENTS.md
 #
 # Codex home detection (#25): the CLI reads $CODEX_HOME from the environment, but the
@@ -22,8 +22,8 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_SRC="$REPO_ROOT/skills"
 ADAPTER_DIR="$REPO_ROOT/adapters/codex"
-SKILLS=(office-router local-email)
-PROMPTS=(office.md email.md)
+SKILLS=(office-router ican-web local-email)
+PROMPTS=(office.md email.md chat.md)
 
 SKILLS_DEST="${ICAN_AGENTS_SKILLS_DIR:-$HOME/.agents/skills}"
 
@@ -192,9 +192,10 @@ done
 cat <<EOF
 
 Done. Verify inside Codex (CLI or IDE):
-  /skills            -> office-router & local-email listed
+  /skills            -> office-router, ican-web & local-email listed
   \$office-router     -> explicit mention works
-  /office, /email    -> custom prompts (also /prompts:office)
-Prereqs: python3 + Mail.app automation approval (email), lark-cli auth login (Feishu).
+  /office, /email, /chat -> custom prompts (also /prompts:office)
+Prereqs: browser control tools + signed-in iCan web session (email operations and chat reads).
+Other Feishu actions: lark-cli auth login; explicit Apple Mail use: python3 + Mail.app automation approval.
 Uninstall: scripts/install-codex.sh --uninstall
 EOF

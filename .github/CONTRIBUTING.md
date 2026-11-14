@@ -28,5 +28,6 @@ GitHub 上管理。
 ## 红线（同 CLAUDE.md）
 
 - 不引入 lark MCP（`mcp__lark__*` / `.mcp.json` / `lark-mcp.sh`）。
-- 邮件只走 Apple Mail，飞书邮箱（`lark-cli mail`）保持停用。
+- 普通邮件的读取、草拟、发送／回复／转发和整理统一走 `ican-web` 网页技能；Apple Mail
+  仅在用户明确指定时通过 `local-email` 使用。飞书邮箱 API（`lark-cli mail`）保持停用。
 - 对外动作（发邮件/IM、建日程、删改数据）必须保留用户确认门槛。

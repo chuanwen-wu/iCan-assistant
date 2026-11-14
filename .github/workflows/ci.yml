@@ -92,7 +92,7 @@ jobs:
             echo "adapters/ must not reference CLAUDE_PLUGIN_ROOT"; exit 1
           fi
           # Repo-level Codex discovery: .agents/skills symlinks must resolve.
-          for s in office-router local-email; do
+          for s in office-router ican-web local-email; do
             test -f ".agents/skills/$s/SKILL.md" \
               || { echo ".agents/skills/$s must symlink to skills/$s"; exit 1; }
           done

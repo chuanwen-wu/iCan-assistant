@@ -1,12 +1,20 @@
 ---
 name: local-email
-description: Read and control the user's local macOS Apple Mail (Mail.app) — list accounts and mailboxes, list/search/read messages, count unread, send, reply, mark read/unread, move, and delete. This is the ONLY mail backend on this Mac — every email intent routes here, including 飞书邮箱 / Feishu Mail (lark-mail is disabled) and the send-email step of any multi-step workflow (e.g. 整理会议纪要后发邮件给参会人). Use whenever the user asks about "my email", "my inbox", "本地邮件", "Apple Mail", 发邮件/发送邮件/写邮件/回复邮件/转发邮件, reading/searching/sending mail on this Mac, or replying to a message. macOS only.
+description: 仅在用户明确指定本机 macOS Apple Mail／本地邮件时，使用 scripts/mail.py 读取、发送、回复、草拟和整理邮件。普通 iCan 邮件读取与发送均使用 ican-web 网页技能，不因网页不可用或发送状态不明而回退到本技能。保留原 CLI 兼容能力；lark-mail 停用。
 ---
 
 # Local Email (Apple Mail control)
 
 Drive the user's Apple Mail through a single CLI wrapper around AppleScript. macOS
 only; Mail.app must exist and the terminal must have Automation access to "Mail".
+
+Ordinary iCan email requests, including inbox/search/read, drafting, sending,
+replying, forwarding and mailbox changes, use `ican-web` at
+`https://icanplatform.feishu.cn/mail`. Use this skill only when the user explicitly
+requests Apple Mail. Do not fall back here when the browser is unavailable or a
+web send has an uncertain result; resending could create a duplicate. The original
+CLI remains available for explicit local use; `lark-mail` / `lark-cli mail` remain
+disabled.
 
 **Engine:** `scripts/mail.py`, bundled inside this skill directory (run with
 `python3`). Resolve it relative to this SKILL.md — i.e.
@@ -23,6 +31,11 @@ only; Mail.app must exist and the terminal must have Automation access to "Mail"
 2. Messages are addressed by their **message id** (the RFC `Message-ID`), shown in
    `list`/`search` output. Pass it as the first positional arg to
    `read`/`reply`/`mark`/`move`/`delete`.
+   A web mailbox row number, subject, URL or accessibility index is not this ID.
+   Only if the user explicitly asks to handle a web original in Apple Mail, match the
+   account/mailbox, sender, subject and time, then read back and verify a unique
+   original before replying or mutating. If it is not synced or ambiguous, stop
+   that action instead of choosing an approximate match.
 3. Read/mark/move/delete default to the **unified inbox**. If a message lives in
    another mailbox/account, pass `--account` and `--mailbox` matching what `list`
    reported (e.g. `--account iCloud --mailbox Sent\ Messages`).

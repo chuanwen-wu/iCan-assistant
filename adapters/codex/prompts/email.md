@@ -1,21 +1,24 @@
 ---
-description: Read or control local Apple Mail (list/search/read/send/reply/mark/move/delete)
+description: Read, draft, send, reply to, and manage email through iCan web
 argument-hint: [request]
 ---
 
-Use the `local-email` skill to act on the user's local Apple Mail.
-
-Engine: `scripts/mail.py` inside the `local-email` skill directory (resolve it
-relative to that skill's SKILL.md, e.g. `~/.agents/skills/local-email/scripts/mail.py`),
-run with `python3`.
+Use `office-router` to classify this email request. By default, use `ican-web`
+for reading, searching, drafting, sending/replying/forwarding, and mailbox actions at
+`https://icanplatform.feishu.cn/mail` in the user's signed-in browser.
 
 User request: $ARGUMENTS
 
 Steps:
-1. If the request is empty, show a quick inbox snapshot: run `unread-count` and
-   `list --limit 10`, then summarize.
-2. Otherwise pick the right subcommand. Always go through `mail.py` — never read
-   `~/Library/Mail` directly.
-3. For `send`/`reply` (real send) and `delete`/`move`: confirm recipients/subject/
-   body or the target message with the user before executing. Prefer `--draft` when
-   the user hasn't clearly said "send it".
+1. If the request is empty, open the inbox and summarize up to ten visible recent
+   messages and the unread count if displayed. State the visible scope.
+2. Follow `ican-web` for normal email operations, including replies/forwards in
+   the original web thread. If login or browser access is unavailable, report the
+   blocker; do not fall back to Apple Mail or `lark-mail`.
+3. Prepare the web composer and verify recipients, subject, body and attachments
+   before asking for confirmation to send. Confirm the exact targets before
+   deleting/moving. If send intent is unclear, keep a web draft and verify its
+   save status. If a send outcome is uncertain, inspect the result before doing
+   anything else; do not click Send again or resend through another backend.
+4. Use `local-email` only when the user explicitly requests Apple Mail; follow
+   that skill's CLI and Message-ID requirements.
